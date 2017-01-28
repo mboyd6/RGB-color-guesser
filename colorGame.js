@@ -1,91 +1,83 @@
 var colors = [];
-
+var winningColor;
+var squareNum = 6;
 var squares = document.querySelectorAll(".square");
 var colorHead = document.querySelector("#winningColor");
 var messageDisplay = document.querySelector("#message");
-var winningColor = "";
-var squareNum = 6;
 var h1 = document.querySelector("h1");
 var reset = document.getElementById("reset");
 var easy = document.getElementById("easy");
 var hard = document.getElementById("hard");
+var modeButtons = document.querySelectorAll(".mode");
 
-reset.addEventListener("click", function() {
+
+init();
+
+//FUNCTIONS
+function init(){
+//mode buttons
+	setUpModeButtons();
+// square event listeners
+	setUpSquares();
+// new game button
+	setUpResetButton();
+// initializes the first color options
+	resetGame();
+}
+
+function setUpModeButtons(){
+	for (var i = 0; i < modeButtons.length; i++) {
+		modeButtons[i].addEventListener("click", function() {
+			modeButtons[0].classList.remove("selected");
+			modeButtons[1].classList.remove("selected");
+			this.classList.add("selected");
+			this.textContent === "Easy" ? squareNum = 3 : squareNum = 6;
+			resetGame();
+		});
+	}
+}
+function setUpSquares{
+	for (var i = 0; i < squares.length; i++) {
+		//add initial colors to squares
+		squares[i].style.background = colors[i];
+		//add click listeners to squares
+		squares[i].addEventListener("click", function(){
+		if(this.style.background === winningColor){
+			changeToWinningColors(winningColor);
+		}
+		else{
+		this.style.background = "#232323";	
+		messageDisplay.textContent = "try again";
+		}
+		});
+	}	
+}
+
+function setUpResetButton(){
+	reset.addEventListener("click", function() {
 	resetGame();
 });
+}
 
-easy.addEventListener("click", function(){
-	this.classList.add("selected");
-	hard.classList.remove("selected");
-	squareNum=3;
-	resetGame();
-	for (var i = 0; i < squares.length; i++) {
-		if(!colors[i]){
-			squares[i].style.display = "none";
-		}
-	}
-	});
-
-hard.addEventListener("click", function(){
-	this.classList.add("selected");
-	easy.classList.remove("selected");
-	squareNum=6;
-	resetGame();
+//resets the game 
+function resetGame(){
+	colors = setColors(squareNum);
+	winningColor = pickColor();
 	for (var i = 0; i < squares.length; i++) {
 		if(colors[i]){
 			squares[i].style.display = "block";
+			squares[i].style.background = colors[i];
+		} else {
+			squares[i].style.display = "none";
 		}
 	}
-});
+	h1.style.background = "steelblue";
+	reset.textContent = "New Colors";
+	messageDisplay.textContent = "";
 
-//MAIN PROCESSING
-// 1. make an array of random colors
-colors = setColors(squareNum);
-	// TESTER console.log(colors);
-winningColor = pickColor();
-	// TESTER console.log(winningColor);
-
-for (var i = 0; i < squares.length; i++) {
-	//add initial colors to squares
-		squares[i].style.background = colors[i];
-
-	//add click listeners to squares
-	squares[i].addEventListener("click", function(){
-		//compare color to picked color
-	if(this.style.background === winningColor){
-		messageDisplay.textContent = " Correct! ";
-		changeToWinningColors(winningColor);
-		h1.style.background = winningColor;
-		reset.textContent = "Play Again?";
-	}
-	else{
-	this.style.background = "#232323";	
-	messageDisplay.textContent = "try again";
-	}
-	});
-}	
-
-
-
-//FUNCTIONS
-/**  Takes the initial colors of 
-
-*/
-function pickColor(){
-	var randNum = Math.floor(Math.random() * (colors.length));
-	colorHead.textContent = colors[randNum];
-	return colors[randNum];
 }
 
-function changeToWinningColors(tempColor) {
-	for (var i = 0; i < squares.length; i++) {
-		squares[i].style.background = tempColor;
-	}
-}
-
-	
-// creates an array, adds random RGB numbers according
-// to amount of num
+//returns an array of random colors as long as the num specified
 function setColors(num){
 	var arr = [];
 	for (var i = 0; i < num; i++) {
@@ -95,13 +87,14 @@ function setColors(num){
 	return arr;
 }
 
+// used in setColor() function. returns an random color formatted
+// like "rgb(33, 54, 222)"
 function randomColor(){
 	var nums = [];
 	var str ="";
 	var color;
 	for (var j = 0; j< 3; j++) {
 			nums.push(Math.floor(Math.random() * (255 + 1)));
-		// TESTER: console.log(nums[j]);
 		}
 
 	color = str.concat(
@@ -112,14 +105,21 @@ function randomColor(){
 	return color;
 }
 
-function resetGame(){
-	colors = setColors(squareNum);
-	winningColor = pickColor();
-	for (var i = 0; i < squares.length; i++) {
-		//squares[i].style.background = "#232323";
-		squares[i].style.background = colors[i];
-	}
-	h1.style.background = "#232323";
-	reset.textContent = "New Colors";
-
+//picks a winning color in the format "rbg(44, 33, 60)"
+function pickColor(){
+	var randNum = Math.floor(Math.random() * (colors.length));
+	colorHead.textContent = colors[randNum];
+	return colors[randNum];
 }
+
+//used when the winning color is clicked
+function changeToWinningColors(tempColor) {
+	for (var i = 0; i < squares.length; i++) {
+		squares[i].style.background = tempColor;
+	}
+	h1.style.background = winningColor;
+	messageDisplay.textContent = " Correct! ";
+	reset.textContent = "Play Again?";
+}
+
+
