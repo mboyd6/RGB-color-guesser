@@ -36,7 +36,7 @@ function setUpModeButtons(){
 		});
 	}
 }
-function setUpSquares{
+function setUpSquares() {
 	for (var i = 0; i < squares.length; i++) {
 		//add initial colors to squares
 		squares[i].style.background = colors[i];
